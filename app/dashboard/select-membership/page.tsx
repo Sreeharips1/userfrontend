@@ -1,9 +1,12 @@
-"use client";
+// "use client";
+
 // import { useState } from "react";
 // import { CreditCard } from "lucide-react";
 
 // export default function SelectMembership() {
 //   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+//   const [isLoading, setIsLoading] = useState(false); // Loading state
+//   const memberID = localStorage.getItem('memberID'); // Retrieve memberID from localStorage
 
 //   const membershipPlans = [
 //     { type: "monthly", price: 1200, description: "Perfect for short-term fitness goals" },
@@ -11,12 +14,51 @@
 //     { type: "annually", price: 11200, description: "Best value for long-term commitment" },
 //   ];
 
-//   const handlePayment = () => {
-//     if (selectedPlan) {
-//       alert(`Proceeding to payment for ${selectedPlan} plan`);
-//       // Add payment logic here
-//     } else {
+//   const handlePayment = async (event: React.MouseEvent) => {
+//     event.stopPropagation(); // Prevent event propagation
+
+//     if (!memberID) {
+//       alert("Member ID is missing. Please log in again.");
+//       return;
+//     }
+
+//     if (!selectedPlan) {
 //       alert("Please select a membership plan");
+//       return;
+//     }
+
+//     const plan = membershipPlans.find(p => p.type === selectedPlan);
+//     if (!plan) {
+//       alert("Invalid membership plan selected");
+//       return;
+//     }
+
+//     setIsLoading(true); // Start loading
+
+//     try {
+//       const response = await fetch('http://localhost:5000/api/payment/create-order', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           membershipID: memberID,
+//           amount: plan.price,
+//           membership_plan: plan.type,
+//         }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error('Failed to create payment order');
+//       }
+
+//       const data = await response.json();
+//       window.location.href = data.url; // Redirect to payment URL
+//     } catch (err) {
+//       console.error("Error creating payment order:", err);
+//       alert("Failed to create payment order. Please try again.");
+//     } finally {
+//       setIsLoading(false); // Stop loading
 //     }
 //   };
 
@@ -43,9 +85,13 @@
 //                   ? "bg-red-600 hover:bg-red-700"
 //                   : "bg-gray-700 hover:bg-gray-600"
 //               } text-white font-medium transition-all`}
-//               onClick={handlePayment}
+//               onClick={(e) => {
+//                 e.stopPropagation(); // Prevent event propagation
+//                 handlePayment(e);
+//               }}
+//               disabled={isLoading} // Disable button while loading
 //             >
-//               Select Plan
+//               {isLoading ? "Processing..." : "Select Plan"}
 //             </button>
 //           </div>
 //         ))}
@@ -56,26 +102,36 @@
 //         <button
 //           onClick={handlePayment}
 //           className="flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg"
+//           disabled={isLoading} // Disable button while loading
 //         >
-//           <CreditCard className="h-5 w-5 mr-2" /> Proceed to Payment
+//           <CreditCard className="h-5 w-5 mr-2" /> 
+//           {isLoading ? "Processing..." : "Proceed to Payment"}
 //         </button>
 //       </div>
 //     </div>
 //   );
 // }
-import { useState } from "react";
+"use client"; // Mark as a Client Component
+
+import { useState, useEffect } from "react";
 import { CreditCard } from "lucide-react";
 
 export default function SelectMembership() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // Loading state
-  const memberID = localStorage.getItem('memberID'); // Retrieve memberID from localStorage
+  const [memberID, setMemberID] = useState<string | null>(null); // Store memberID in state
 
   const membershipPlans = [
     { type: "monthly", price: 1200, description: "Perfect for short-term fitness goals" },
     { type: "quarterly", price: 4000, description: "Ideal for consistent training over 3 months" },
     { type: "annually", price: 11200, description: "Best value for long-term commitment" },
   ];
+
+  // Fetch memberID from localStorage on the client side
+  useEffect(() => {
+    const id = localStorage.getItem("memberID");
+    setMemberID(id);
+  }, []);
 
   const handlePayment = async (event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent event propagation
@@ -90,7 +146,7 @@ export default function SelectMembership() {
       return;
     }
 
-    const plan = membershipPlans.find(p => p.type === selectedPlan);
+    const plan = membershipPlans.find((p) => p.type === selectedPlan);
     if (!plan) {
       alert("Invalid membership plan selected");
       return;
@@ -99,10 +155,10 @@ export default function SelectMembership() {
     setIsLoading(true); // Start loading
 
     try {
-      const response = await fetch('http://localhost:5000/api/payment/create-order', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/payment/create-order", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           membershipID: memberID,
@@ -112,7 +168,7 @@ export default function SelectMembership() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create payment order');
+        throw new Error("Failed to create payment order");
       }
 
       const data = await response.json();
@@ -167,7 +223,7 @@ export default function SelectMembership() {
           className="flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg"
           disabled={isLoading} // Disable button while loading
         >
-          <CreditCard className="h-5 w-5 mr-2" /> 
+          <CreditCard className="h-5 w-5 mr-2" />
           {isLoading ? "Processing..." : "Proceed to Payment"}
         </button>
       </div>
