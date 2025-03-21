@@ -60,7 +60,7 @@ export default function Sidebar() {
 
       {/* Footer Section */}
       <div className="text-center text-gray-400 text-sm">
-        <p>© 2025 webgeon solutions</p>
+        <p>© 2025 webgeon Results</p>
         <p>All rights reserved</p>
       </div>
     </div>

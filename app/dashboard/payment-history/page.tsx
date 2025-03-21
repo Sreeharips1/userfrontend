@@ -161,8 +161,7 @@
 //     </div>
 //   );
 // }
-"use client"; // Mark as a Client Component
-
+"use client";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 
@@ -181,22 +180,18 @@ export default function PaymentHistory() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [memberID, setMemberID] = useState<string | null>(null); // Store memberID in state
 
-  // Fetch memberID from localStorage on the client side
   useEffect(() => {
-    const id = localStorage.getItem("memberID");
-    setMemberID(id);
-  }, []);
+    // Retrieve memberID from localStorage on the client side
+    const memberID = localStorage.getItem("memberID");
 
-  // Fetch payment details
-  useEffect(() => {
     if (!memberID) {
       setError("Member ID is missing. Please log in again.");
       setLoading(false);
       return;
     }
 
+    // Fetch payment details
     const fetchPaymentDetails = async () => {
       try {
         const response = await fetch(
@@ -218,7 +213,7 @@ export default function PaymentHistory() {
     };
 
     fetchPaymentDetails();
-  }, [memberID]);
+  }, []);
 
   if (loading) {
     return (
