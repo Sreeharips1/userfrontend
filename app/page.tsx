@@ -73,7 +73,7 @@ export default function HomePage() {
       {/* Home Icon */}
       <div className="mt-8">
         <Link
-          href="https://flexzone-gym.vercel.app/"
+          href="https://www.flexzonegym.com/"
           className="text-red-600 hover:text-red-800 transition-all duration-300 flex items-center justify-center"
         >
           <Home className="w-6 h-6 md:w-8 md:h-8 transition-transform transform hover:scale-110" />
