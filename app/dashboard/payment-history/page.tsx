@@ -195,7 +195,7 @@ export default function PaymentHistory() {
     const fetchPaymentDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/payment/payment-details/${memberID}`
+          `https://userbackend-1.onrender.com/api/payment/payment-details/${memberID}`
         );
 
         if (!response.ok) {
