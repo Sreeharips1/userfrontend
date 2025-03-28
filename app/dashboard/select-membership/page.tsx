@@ -42,7 +42,7 @@ export default function SelectMembership() {
     setIsLoading(true); // Start loading
 
     try {
-      const response = await fetch("http://localhost:5000/api/payment/create-order", {
+      const response = await fetch("https://userbackend-1.onrender.com/api/payment/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
