@@ -28,20 +28,11 @@ const LoginPage = () => {
                 email = otplessUser.identities[0].identityValue;
             }
 
-            // If email is missing, prompt user to enter manually
-            // if (!email) {
-            //     email = prompt("Please enter your email:");
-            //     if (!email) {
-            //         alert("Email is required to continue.");
-            //         return;
-            //     }
-            // }
-
             console.log("Final Email:", email);
 
             setLoading(true);
             try {
-                const response = await fetch('https://userbackend-1.onrender.com/api/auth/handlelogin', {
+                const response = await fetch('http://localhost:5000/api/auth/handlelogin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email }),
@@ -77,17 +68,25 @@ const LoginPage = () => {
     }, [router]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 to-gray-800 p-4">
-            <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border-2 border-red-800 max-w-md w-full relative">
-                <Link href="/" className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full p-2 text-red-600 hover:text-red-800 transition-all">
+        <div 
+            className="flex items-center justify-center min-h-screen p-4"
+            style={{
+                backgroundImage: "url('/assets/bbb.png')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
+            <div className=" p-6 rounded-xl shadow-2xl max-w-md w-full relative backdrop-blur-sm">
+                <Link href="/" className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full p-2 text-white hover:text-gray-300 transition-all">
                     <ArrowLeft className="w-6 h-6" />
                 </Link>
-                <Link href="/register" className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-full p-2 text-red-600 hover:text-red-800 transition-all">
+                <Link href="/register" className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-full p-2 text-white hover:text-gray-300 transition-all">
                     <ArrowRight className="w-6 h-6" />
                 </Link>
                 {loading ? (
                     <div className="flex justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-800"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
                     </div>
                 ) : (
                     <div id="otpless-login-page" className="flex justify-center"></div>
