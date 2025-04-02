@@ -25,7 +25,7 @@ export default function SelectMembership() {
     
     const fetchPlans = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/membership/plans");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/membership/plans`);
         if (!response.ok) {
           throw new Error("Failed to fetch membership plans");
         }
