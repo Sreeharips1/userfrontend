@@ -208,7 +208,7 @@ export default function AssignedTrainerPage() {
             </svg>
             <h3 className="mt-2 text-lg font-medium text-gray-900">No Trainer Assigned</h3>
             <p className="mt-1 text-sm text-gray-500">
-              You currently don't have a trainer assigned to you.
+              You currently don&apos;t have a trainer assigned to you.
             </p>
           </div>
         </div>
