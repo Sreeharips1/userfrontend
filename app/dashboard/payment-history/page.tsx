@@ -31,7 +31,7 @@
 //     const fetchPaymentDetails = async () => {
 //       try {
 //         const response = await fetch(
-//           `https://userbackend-1.onrender.com/api/payment/payment-details/${memberID}`
+//           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payment/payment-details/${memberID}`
 //         );
 
 //         if (!response.ok) {
