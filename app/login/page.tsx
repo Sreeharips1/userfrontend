@@ -32,7 +32,7 @@ const LoginPage = () => {
 
             setLoading(true);
             try {
-                const response = await fetch('http://localhost:5000/api/auth/handlelogin', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/handlelogin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email }),
