@@ -16,7 +16,7 @@ export default function SelectMembership() {
   const [memberID, setMemberID] = useState<string | null>(null);
   const [plans, setPlans] = useState<MembershipPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  
 
   // Fetch memberID from localStorage and plans from backend
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function SelectMembership() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/payment/create-order/${memberID}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payment/create-order/${memberID}`,
         {
           method: "POST",
           headers: {
