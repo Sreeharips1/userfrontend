@@ -10,8 +10,8 @@ interface User {
   email: string;
   membershipID: string;
   membership_status: "Active" | "Inactive";
-  membership_plan?: string; // Optional
-  payment_status?: string; // Optional
+  membership_plan?: string;
+  payment_status?: string;
   age: number;
   gender: string;
   phone_number: string;
@@ -19,9 +19,11 @@ interface User {
 }
 
 export default function DashboardHome() {
-  const [user, setUser] = useState<User | null>(null); // Use the User type
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [barcode, setBarcode] = useState<string | null>(null);
+  const [barcodeLoading, setBarcodeLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -48,10 +50,15 @@ export default function DashboardHome() {
         const data = await response.json();
         setUser(data.user);
         localStorage.setItem('memberID', data.user.membershipID);
+
+        // Fetch barcode if payment is completed
+        if (data.user.payment_status === "completed") {
+          fetchBarcode(data.user.membershipID);
+        }
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Error loading your profile");
-        if ((err as Error).message.includes('401')) { // Explicitly type err as Error
+        if ((err as Error).message.includes('401')) {
           localStorage.removeItem('authToken');
           localStorage.removeItem('memberID');
           router.push('/login');
@@ -62,13 +69,36 @@ export default function DashboardHome() {
     };
 
     fetchUserProfile();
-  }, [router]); // Add router to the dependency array
+  }, [router]);
+
+  const fetchBarcode = async (membershipID: string) => {
+    setBarcodeLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payment/barcode/${membershipID}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch barcode');
+      }
+
+      const data = await response.json();
+      if (data.success && data.barcode) {
+        setBarcode(data.barcode);
+      }
+    } catch (err) {
+      console.error("Error fetching barcode:", err);
+      setError("Failed to load membership barcode");
+    } finally {
+      setBarcodeLoading(false);
+    }
+  };
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('memberID');
     router.push('/login');
-  }, [router]); // Add router to the dependency array
+  }, [router]);
 
   if (loading) {
     return (
@@ -179,6 +209,51 @@ export default function DashboardHome() {
           </div>
         </div>
       </div>
+
+      {/* Barcode Section - Only shown for active members */}
+      {user.payment_status === "completed" && (
+        <div className="mt-8 p-6 rounded-lg border border-gray-700 bg-white">
+          <h2 className="text-2xl text-gray-600 font-semibold mb-4">Membership Card</h2>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* Member Info */}
+            <div className="space-y-2">
+              <div className="text-xl font-bold">{user.full_name}</div>
+              <div className="text-gray-400">ID: {user.membershipID}</div>
+              {user.membership_plan && (
+                <div className="text-gray-400">Plan: {user.membership_plan}</div>
+              )}
+              <div className="text-green-400 flex items-center">
+                <CheckCircle className="h-5 w-5 mr-1" /> Active Member
+              </div>
+            </div>
+            
+            {/* Barcode Display */}
+            <div className="flex flex-col items-center">
+              {barcodeLoading ? (
+                <div className="flex items-center justify-center h-32 w-64">
+                  <Loader className="animate-spin h-8 w-8 text-red-500" />
+                </div>
+              ) : barcode ? (
+                <>
+                  <img 
+                    src={barcode} 
+                    alt="Membership Barcode" 
+                    className="h-24 w-64 object-contain"
+                  />
+                  <div className="mt-2 text-sm text-gray-400">
+                    Scan at gym entrance
+                  </div>
+                </>
+              ) : (
+                <div className="text-red-400">
+                  Barcode not available
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer Section */}
       <div className="mt-8 text-center text-gray-400">
