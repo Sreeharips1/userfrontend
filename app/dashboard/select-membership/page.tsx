@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CreditCard } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 
 interface MembershipPlan {
   Monthly: number;
