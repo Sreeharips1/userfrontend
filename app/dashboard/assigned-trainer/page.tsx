@@ -9,14 +9,16 @@ interface Trainer {
   trainer_name: string;
   specialization: string;
   phone_number: string;
-  availability: string | { [day: string]: boolean };
+  availability: string | { [day: string]: boolean } | undefined;
   passport_photo: string | null;
   assigned_Members?: number;
 }
 
 // Helper function to parse availability
-const parseAvailability = (availability: string | { [day: string]: boolean }) => {
-  if (typeof availability === 'string') {
+const parseAvailability = (availability: string | { [day: string]: boolean } | undefined) => {
+  if (!availability) return {}; // Ensure availability is always an object
+
+  if (typeof availability === "string") {
     try {
       return JSON.parse(availability);
     } catch (e) {
@@ -24,13 +26,16 @@ const parseAvailability = (availability: string | { [day: string]: boolean }) =>
       return {};
     }
   }
+
   return availability;
 };
 
 // Helper function to check if trainer is currently available
-const isTrainerAvailable = (availability: string | { [day: string]: boolean }) => {
+const isTrainerAvailable = (availability: string | { [day: string]: boolean } | undefined) => {
   const availabilityObj = parseAvailability(availability);
-  const today = new Date().toLocaleString('en-us', { weekday: 'long' }).toLowerCase();
+  if (!availabilityObj) return false; // Ensure we don’t access undefined
+
+  const today = new Date().toLocaleString("en-us", { weekday: "long" }).toLowerCase();
   return availabilityObj[today] === true;
 };
 
@@ -67,7 +72,7 @@ export default function AssignedTrainerPage() {
       } catch (err) {
         const error = err as AxiosError<{ error?: string }>;
         console.error("Error fetching trainer:", error);
-        
+
         if (error.response?.status === 404) {
           setTrainer(null);
           if (error.response.data?.error === "Member not found") {
@@ -76,9 +81,8 @@ export default function AssignedTrainerPage() {
             toast.error("No trainer assigned");
           }
         } else {
-          const errorMessage = error.response?.data?.error || 
-                              error.message ||
-                              "Failed to fetch trainer details";
+          const errorMessage =
+            error.response?.data?.error || error.message || "Failed to fetch trainer details";
           setError(errorMessage);
           toast.error(errorMessage);
         }
@@ -130,7 +134,8 @@ export default function AssignedTrainerPage() {
                   src={trainer.passport_photo}
                   alt={`${trainer.trainer_name}'s photo`}
                   className="w-full max-w-[250px] h-auto rounded-lg object-cover border border-red-500"
-                  width={500} height={300}
+                  width={500}
+                  height={300}
                 />
               </div>
             ) : (
@@ -140,82 +145,72 @@ export default function AssignedTrainerPage() {
                 </div>
               </div>
             )}
-            
+
             <div className="md:w-2/3 p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-red-500">NAME :{trainer.trainer_name}</h2>
                 <p className="text-sm text-red-500">ID: {trainer.trainerID}</p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-700 mb-2">Specialization</h3>
                   <p className="text-gray-600">{trainer.specialization}</p>
                 </div>
-                
+
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-700 mb-2">Contact:</h3>
                   <p className="text-gray-600">{trainer.phone_number}</p>
                 </div>
-                
+
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-700 mb-2">Availability:</h3>
                   <p className="text-gray-600">
-                    {isTrainerAvailable(trainer.availability) ? 
-                      <span className="text-green-500">Available Today</span> : 
-                      <span className="text-red-500">Not Available Today</span>}
+                    {isTrainerAvailable(trainer.availability) ? (
+                      <span className="text-green-500">Available Today</span>
+                    ) : (
+                      <span className="text-red-500">Not Available Today</span>
+                    )}
                   </p>
-                  <details className="mt-2 text-sm text-gray-500">
-                    <summary>Weekly Schedule</summary>
-                    <div className="mt-2 grid grid-cols-2 gap-2">
-                      {Object.entries(parseAvailability(trainer.availability)).map(([day, isAvailable]) => (
-                        <div key={day} className="flex items-center">
-                          <span className="capitalize">{day}:</span>
-                          <span className={`ml-2 ${isAvailable ? 'text-green-500' : 'text-red-500'}`}>
-                            {isAvailable ? '✓' : '✗'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
+                  {trainer.availability &&
+                  Object.keys(parseAvailability(trainer.availability)).length > 0 ? (
+                    <details className="mt-2 text-sm text-gray-500">
+                      <summary>Weekly Schedule</summary>
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        {Object.entries(parseAvailability(trainer.availability)).map(
+                          ([day, isAvailable]) => (
+                            <div key={day} className="flex items-center">
+                              <span className="capitalize">{day}:</span>
+                              <span
+                                className={`ml-2 ${isAvailable ? "text-green-500" : "text-red-500"}`}
+                              >
+                                {isAvailable ? "✓" : "✗"}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </details>
+                  ) : (
+                    <p className="text-gray-500">Availability not provided</p>
+                  )}
                 </div>
-                
+
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-700 mb-2">Assigned Members:</h3>
-                  <p className="text-gray-600">
-                    {trainer.assigned_Members || 0}
-                  </p>
+                  <p className="text-gray-600">{trainer.assigned_Members || 0}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <div className="text-center py-8">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">No Trainer Assigned</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              You currently don&apos;t have a trainer assigned to you.
-            </p>
-          </div>
-        </div>
+        <p>No Trainer Assigned</p>
       )}
     </div>
   );
 }
+
 // "use client";
 // import { useState, useEffect } from "react";
 // import axios from "axios";
