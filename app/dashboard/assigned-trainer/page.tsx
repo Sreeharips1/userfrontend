@@ -16,7 +16,7 @@ export default function AssignedTrainerPage() {
   useEffect(() => {
     const fetchTrainer = async () => {
       try {
-        const { data } = await axios.get<Trainer>("http://localhost:5000/api/trainers/assigned-trainer");
+        const { data } = await axios.get<Trainer>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/trainers/assigned-trainer`);
         setTrainer(data);
       } catch  {
         toast.error("Failed to fetch trainer details");
