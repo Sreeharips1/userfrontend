@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
 
 interface Trainer {
   trainerID: string;
@@ -125,10 +126,11 @@ export default function AssignedTrainerPage() {
           <div className="md:flex">
             {trainer.passport_photo ? (
               <div className="md:w-1/3 p-6 bg-gray-50 flex items-center justify-center">
-                <img
+                <Image
                   src={trainer.passport_photo}
                   alt={`${trainer.trainer_name}'s photo`}
                   className="w-full max-w-[250px] h-auto rounded-lg object-cover border border-red-500"
+                  width={500} height={300}
                 />
               </div>
             ) : (
